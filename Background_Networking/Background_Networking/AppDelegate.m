@@ -48,7 +48,7 @@
         button.enabled = NO;
     };
     
-    UIProgressView* progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
+    UIProgressView *progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
     progressView.progress = 0;
     progressView.frame = CGRectMake(0, 120, self.window.frame.size.width, 20);
     [self.window addSubview:progressView];

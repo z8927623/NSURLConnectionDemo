@@ -59,6 +59,7 @@
     [self.connection start];
  
     // 2
+    // (1)
 //    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
 //    NSRunLoop *currentRunLoop = [NSRunLoop currentRunLoop];
 //    // 向当前runloop添加事件源
@@ -66,6 +67,13 @@
 //    [self.connection scheduleInRunLoop:currentRunLoop forMode:NSRunLoopCommonModes];
 //    [self.connection start];
 //    [currentRunLoop run];
+    
+    // (2)
+//    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+//    NSRunLoop *currentRunLoop = [NSRunLoop currentRunLoop];
+//    [self.connection scheduleInRunLoop:currentRunLoop forMode:NSRunLoopCommonModes];
+//    [self.connection start];
+//    CFRunLoopRun();
 }
 
 - (void)cancel

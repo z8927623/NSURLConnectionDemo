@@ -38,24 +38,39 @@
 {
     NSLog(@"current thread is main thread: %d", [NSThread isMainThread]);
     
-    NSURLRequest* request = [NSURLRequest requestWithURL:self.url];
+    NSURLRequest *request = [NSURLRequest requestWithURL:self.url];
     
+//    self.isExecuting = YES;
+//    self.isConcurrent = YES;
+//    self.isFinished = NO;
+    
+    
+    // way 1
+//    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+//    
+//        self.isExecuting = YES;
+//        self.isConcurrent = YES;
+//        self.isFinished = NO;
+//        
+//        self.connection =[[NSURLConnection alloc] initWithRequest:request
+//                                                         delegate:self
+//                                                 startImmediately:NO];
+//        [self.connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+//        [self.connection start];
+//    }];
+    
+    
+    // way 2
     self.isExecuting = YES;
     self.isConcurrent = YES;
     self.isFinished = NO;
     
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        
-        self.isExecuting = YES;
-        self.isConcurrent = YES;
-        self.isFinished = NO;
-        
-        self.connection =[[NSURLConnection alloc] initWithRequest:request
-                                                         delegate:self
-                                                 startImmediately:NO];
-        [self.connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-        [self.connection start];
-    }];
+    self.connection =[[NSURLConnection alloc] initWithRequest:request
+                                                     delegate:self
+                                             startImmediately:NO];
+    [self.connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+    [self.connection start];
+    CFRunLoopRun();
 }
 
 - (void)cancel
