@@ -24,7 +24,7 @@
 + (void)networkEntry:(id)__unused object
 {
     @autoreleasepool {
-        NSLog(@"1 current thread: %@  %d", [NSThread currentThread], [NSThread isMainThread]);
+        NSLog(@"1 current thread is main thread: %d", [NSThread isMainThread]);
         
         NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
         // 向当前runloop添加事件源
@@ -47,8 +47,8 @@
 
 - (void)start
 {
-    NSLog(@"2 current thread: %@  %d", [NSThread currentThread], [NSThread isMainThread]);
-    NSLog(@"3 current run loop is main run loop?: %d", [NSRunLoop currentRunLoop] == [NSRunLoop mainRunLoop]);
+    NSLog(@"2 current thread is main thread: %d", [NSThread isMainThread]);
+    NSLog(@"2 current run loop is main run loop?: %d", [NSRunLoop currentRunLoop] == [NSRunLoop mainRunLoop]);
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:self.URL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:self.timeoutInterval];
     [request setHTTPMethod:@"GET"];

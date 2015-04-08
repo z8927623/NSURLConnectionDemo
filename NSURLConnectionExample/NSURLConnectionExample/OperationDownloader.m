@@ -39,14 +39,16 @@
 + (void)networkEntry:(id)__unused object
 {
     @autoreleasepool {
-        NSLog(@"2 current thread: %@  %d", [NSThread currentThread], [NSThread isMainThread]);
+        NSLog(@"1 current thread is main thread: %d", [NSThread isMainThread]);
         
         NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
+        // 添加port事件源
         [runLoop addPort:[NSMachPort port] forMode:NSDefaultRunLoopMode];
         [runLoop run];
     }
 }
 
+// 独立开启线程，并启用其runloop
 + (NSThread *)networkThread
 {
     static NSThread *_networkThread = nil;
@@ -63,7 +65,7 @@
 {
     [self.lock lock];
     
-    NSLog(@"1 current thread: %@  %d", [NSThread currentThread], [NSThread isMainThread]);
+    NSLog(@"2 current thread is main thread: %d", [NSThread isMainThread]);
     
     if (self.isCancelled) {
         [self willChangeValueForKey:@"isFinished"];
@@ -170,12 +172,9 @@
     
     // way 2  currentRunLoop
 //    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-//    NSRunLoop *currentRunLoop = [NSRunLoop currentRunLoop];
-//    // 向当前runloop添加事件源
-//    [currentRunLoop addPort:[NSPort port] forMode:NSDefaultRunLoopMode];
-//    [self.connection scheduleInRunLoop:currentRunLoop forMode:NSRunLoopCommonModes];
+//    [self.connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
 //    [self.connection start];
-//    [currentRunLoop run];
+//    [[NSRunLoop currentRunLoop] run];
 
     // way 3  using AFNetworking way
     self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];

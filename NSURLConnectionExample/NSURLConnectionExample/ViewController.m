@@ -33,31 +33,31 @@
     NSString *URLString = @"http://c.hiphotos.baidu.com/image/pic/item/5fdf8db1cb13495453bb9e33554e9258d1094a3b.jpg";
     
     // 1 OperationDownloader
-//    OperationDownloader *downloader = [OperationDownloader downloadWithURL:[NSURL URLWithString:URLString] timeoutInterval:15 success:^(id responseData) {
-//        
-//        NSLog(@"get data size: %lu", [(NSData *)responseData length]);
-//        NSLog(@"success block in main thread?: %d", [NSThread isMainThread]);
-//        
-//    } failure:^(NSError *error) {
-//        
-//        NSLog(@"failure block in main thread?: %d", [NSThread isMainThread]);
-//    }];
-//    
-//    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-//    [queue addOperation:downloader];
-
-    
-    // 2 ThreadDownloader
-    ThreadDownloader *downloader = [ThreadDownloader downloadWithURL:[NSURL URLWithString:URLString] timeoutInterval:15 success:^(id responseData) {
+    OperationDownloader *downloader = [OperationDownloader downloadWithURL:[NSURL URLWithString:URLString] timeoutInterval:15 success:^(id responseData) {
         
         NSLog(@"get data size: %lu", [(NSData *)responseData length]);
         NSLog(@"success block in main thread?: %d", [NSThread isMainThread]);
-
+        
     } failure:^(NSError *error) {
+        
         NSLog(@"failure block in main thread?: %d", [NSThread isMainThread]);
     }];
     
-    NSLog(@"started downloader: %@", downloader.URL.absoluteString);
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    [queue addOperation:downloader];
+
+    
+//    // 2 ThreadDownloader
+//    ThreadDownloader *downloader = [ThreadDownloader downloadWithURL:[NSURL URLWithString:URLString] timeoutInterval:15 success:^(id responseData) {
+//        
+//        NSLog(@"get data size: %lu", [(NSData *)responseData length]);
+//        NSLog(@"success block in main thread?: %d", [NSThread isMainThread]);
+//
+//    } failure:^(NSError *error) {
+//        NSLog(@"failure block in main thread?: %d", [NSThread isMainThread]);
+//    }];
+//    
+//    NSLog(@"started downloader: %@", downloader.URL.absoluteString);
 
 }
 

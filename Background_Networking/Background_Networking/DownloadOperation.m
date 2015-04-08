@@ -65,12 +65,25 @@
     self.isConcurrent = YES;
     self.isFinished = NO;
     
+    // 后台线程的RunLoop是默认没有启动的。 后台线程的RunLoop没有启动的情况下的现象就是：“代码执行完，线程就结束被回收了”。就像我们简单的程序执行完就退出了。 所以如果我们希望在代码执行完成后还要保留线程等待一些异步的事件时，比如NSURLConnection和NSTimer， 就需要手动启动后台线程的RunLoop。 启动RunLoop，我们需要设定RunLoop的模式，我们可以设置 NSDefaultRunLoopMode。 那默认就是监听所有时间源：
+    // (1)
+//    self.connection =[[NSURLConnection alloc] initWithRequest:request
+//                                                     delegate:self
+//                                             startImmediately:NO];
+//    [self.connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+//    [self.connection start];
+//    // Core Foundation
+//    CFRunLoopRun();   // 使用CFRunLoopStop(CFRunLoopGetCurrent());来停止或者所有事件源或者timer移除
+    
+    
+    // (2)
     self.connection =[[NSURLConnection alloc] initWithRequest:request
                                                      delegate:self
                                              startImmediately:NO];
+
     [self.connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
     [self.connection start];
-    CFRunLoopRun();
+    [[NSRunLoop currentRunLoop] run];
 }
 
 - (void)cancel
