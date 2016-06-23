@@ -82,13 +82,50 @@
 //    [self operationDidStart];
     
     // AFNetworking way
-    [self performSelector:@selector(operationDidStart) onThread:[[self class] networkThread] withObject:nil waitUntilDone:NO];
+//    [self performSelector:@selector(operationDidStart) onThread:[[self class] networkThread] withObject:nil waitUntilDone:NO];
+    
+    
+//    [self.lock lock];
+    
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:self.URL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:self.timeoutInterval];
+    [request setHTTPMethod:@"GET"];
+    
+    // way 1  mainRunLoop
+//    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+//    [self.connection scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+//    [self.connection start];
+    
+    // way 2
+//    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+//    [self.connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+//    [self.connection start];
+//    [[NSRunLoop currentRunLoop] run];
+    
+        // way 3
+//    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+//    [self.connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+//    [self.connection start];
+//    CFRunLoopRun();
+    
+    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+    [self.connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+    [self.connection start];
+    CFRunLoopRun();
+//    [[NSRunLoop currentRunLoop] run];
+    
+    NSLog(@"thread: %@", [NSThread currentThread]);
+    
+    [self.lock unlock];
 
     executing = YES;
     
     [self didChangeValueForKey:@"isExecuting"];
     
     [self.lock unlock];
+}
+
+- (void)dealloc {
+    NSLog(@"dealloc");
 }
 
 - (void)cancel
@@ -160,28 +197,29 @@
 
 - (void)operationDidStart
 {
-    [self.lock lock];
-    
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:self.URL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:self.timeoutInterval];
-    [request setHTTPMethod:@"GET"];
-    
-    // way 1  mainRunLoop
-//    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-//    [self.connection scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-//    [self.connection start];
-    
-    // way 2  currentRunLoop
+//    [self.lock lock];
+//    
+//    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:self.URL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:self.timeoutInterval];
+//    [request setHTTPMethod:@"GET"];
+//    
+//    // way 1  mainRunLoop
+////    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+////    [self.connection scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+////    [self.connection start];
+//    
+//    // way 2  currentRunLoop
 //    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
 //    [self.connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
 //    [self.connection start];
 //    [[NSRunLoop currentRunLoop] run];
-
-    // way 3  using AFNetworking way
-    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-    [self.connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-    [self.connection start];
-    
-    [self.lock unlock];
+//
+////    // way 3  using AFNetworking way
+////    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+////    [self.connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+////    [self.connection start];
+////    CFRunLoopRun();
+//    
+//    [self.lock unlock];
 }
 
 - (void)operationDidFinish
@@ -225,6 +263,8 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
+    NSLog(@"hehe thread: %@", [NSThread currentThread]);
+    
     NSLog(@"connectionDidFinishLoading in main thread?: %d", [NSThread isMainThread]);
     
     self.connection = nil;

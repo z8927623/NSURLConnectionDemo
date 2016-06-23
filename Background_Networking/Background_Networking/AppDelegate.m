@@ -11,7 +11,12 @@
 
 @interface AppDelegate ()
 
+
 @property (nonatomic, strong) DownloadOperation *downloadOperation;
+
+@property (nonatomic, strong) DownloadOperation *downloadOperation2;
+
+@property (nonatomic, strong) DownloadOperation *downloadOperation3;
 
 @end
 
@@ -26,13 +31,17 @@
     self.window.backgroundColor = [UIColor whiteColor];
     
     NSOperationQueue *operationQueue = [[NSOperationQueue alloc] init];
-    operationQueue.maxConcurrentOperationCount = 1;
+    operationQueue.maxConcurrentOperationCount = 3;
     
     _downloadOperation = [[DownloadOperation alloc] initWithURL:[NSURL URLWithString:@"http://dldir1.qq.com/qqfile/tm/TM2013Preview1.exe"]];
+    _downloadOperation2 = [[DownloadOperation alloc] initWithURL:[NSURL URLWithString:@"http://dldir1.qq.com/qqfile/tm/TM2013Preview1.exe"]];
+    _downloadOperation3 = [[DownloadOperation alloc] initWithURL:[NSURL URLWithString:@"http://dldir1.qq.com/qqfile/tm/TM2013Preview1.exe"]];
     [operationQueue addOperation:_downloadOperation];
-    [operationQueue addOperationWithBlock:^{
-         NSLog(@"next operation");
-    }];
+    [operationQueue addOperation:_downloadOperation2];
+    [operationQueue addOperation:_downloadOperation3];
+//    [operationQueue addOperationWithBlock:^{
+//         NSLog(@"next operation");
+//    }];
     
     // start会运行在调用他的线程上
 //    [_downloadOperation start];
@@ -45,7 +54,12 @@
     
     // 完成或取消时候要执行的block
     _downloadOperation.completionBlock = ^{
-        button.enabled = NO;
+        NSLog(@"here");
+        NSLog(@"thread: %@", @([NSThread isMainThread]));
+        dispatch_async(dispatch_get_main_queue(), ^{
+            button.userInteractionEnabled = NO;
+            NSLog(@"thread: %@", @([NSThread isMainThread]));
+        });
     };
     
     UIProgressView *progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];

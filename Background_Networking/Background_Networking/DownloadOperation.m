@@ -34,6 +34,27 @@
     return self;
 }
 
++ (void)networkRequestThreadEntryPoint:(id)__unused object {
+    @autoreleasepool {
+        [[NSThread currentThread] setName:@"BackgroundNetworking"];
+        
+        NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
+//        [runLoop addPort:[NSMachPort port] forMode:NSDefaultRunLoopMode];
+        [runLoop run];
+    }
+}
+
++ (NSThread *)networkRequestThread {
+    static NSThread *_networkRequestThread = nil;
+    static dispatch_once_t oncePredicate;
+    dispatch_once(&oncePredicate, ^{
+        _networkRequestThread = [[NSThread alloc] initWithTarget:self selector:@selector(networkRequestThreadEntryPoint:) object:nil];
+        [_networkRequestThread start];
+    });
+    
+    return _networkRequestThread;
+}
+
 - (void)start
 {
     NSLog(@"current thread is main thread: %d", [NSThread isMainThread]);
@@ -77,13 +98,26 @@
     
     
     // (2)
+//    self.connection =[[NSURLConnection alloc] initWithRequest:request
+//                                                     delegate:self
+//                                             startImmediately:NO];
+//
+//    [self.connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+//    [self.connection start];
+//    [[NSRunLoop currentRunLoop] run];
+    
+    [self performSelector:@selector(operationDidStart) onThread:[[self class] networkRequestThread] withObject:nil waitUntilDone:NO modes:@[NSRunLoopCommonModes]];
+}
+
+- (void)operationDidStart
+{
+    NSURLRequest *request = [NSURLRequest requestWithURL:self.url];
     self.connection =[[NSURLConnection alloc] initWithRequest:request
                                                      delegate:self
                                              startImmediately:NO];
-
+    
     [self.connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
     [self.connection start];
-    [[NSRunLoop currentRunLoop] run];
 }
 
 - (void)cancel
@@ -129,7 +163,9 @@
 {
     [self.buffer appendData:data];
     // 调用block
-    self.progressCallback(self.buffer.length / (float)self.expectedContentLength);
+    if (self.progressCallback) {
+        self.progressCallback(self.buffer.length / (float)self.expectedContentLength);
+    }
 }
 
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse
